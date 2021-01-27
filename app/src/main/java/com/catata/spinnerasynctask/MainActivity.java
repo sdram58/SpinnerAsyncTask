@@ -47,13 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         progressBar = (ProgressBar) findViewById(R.id.progress);
 
-        List<Ubicacion> ubicacions = new ArrayList<Ubicacion>();
-        ubicacions.add(new Comunidad(0,"asdsad"));
-        ubicacions.add(new Comunidad(0,"asdsad"));
-        ubicacions.add(new Comunidad(0,"asdsad"));
-        ubicacions.add(new Comunidad(0,"asdsad"));
-
-        spinnerAdapterComunidad = new SpinnerAdapter(this, ubicacions);
+        spinnerAdapterComunidad = new SpinnerAdapter(this, new ArrayList<Ubicacion>());
         spinnerAdapterProvincia = new SpinnerAdapter(this, new ArrayList<Ubicacion>());
         spinnerAdapterLocalidad = new SpinnerAdapter(this, new ArrayList<Ubicacion>());
 
@@ -65,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         spComunidad.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Comunidad comunidad = (Comunidad) spinnerAdapterComunidad.getItem(position);
+                Comunidad comunidad = (Comunidad) parent.getAdapter().getItem(position);
                 getProvinciasByComunidad(comunidad.getId());
             }
 
@@ -91,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         spLocalidad.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(!spinnerAdapterLocalidad.getItem(position).getDescripcion().equals(""))
+                if(position!=0 && !spinnerAdapterLocalidad.getItem(position).getDescripcion().equals(""))
                     Toast.makeText(MainActivity.this,"Has elegido " + spinnerAdapterLocalidad.getItem(position).getDescripcion(),Toast.LENGTH_SHORT).show();
             }
 
@@ -129,8 +123,8 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-
-                comunidades.add(0,new Comunidad(-1,""));
+                //Se añade una comunidad al incio para que cuando salte OnItemSelectedListener no devuelva nada.
+                comunidades.add(0,new Comunidad(-1,getString(R.string.choose_com)));
                 spinnerAdapterComunidad.setUbicaciones(comunidades);
                 progressBar.setVisibility(View.GONE);
             }
@@ -161,8 +155,10 @@ public class MainActivity extends AppCompatActivity {
                 if(provincias.size()>0){
                     spProvincia.setVisibility(View.VISIBLE);
                 }
-                provincias.add(0,new Provincia(-1,""));
+                provincias.add(0,new Provincia(-1,getString(R.string.choose_prov)));
                 spinnerAdapterProvincia.setUbicaciones(provincias);
+
+                ((SpinnerAdapter)spLocalidad.getAdapter()).notifyDataSetChanged();
                 progressBar.setVisibility(View.GONE);
             }
         }).execute(URL_PROVINCIA_BY_COMUNIDAD + comunidad);
@@ -191,8 +187,9 @@ public class MainActivity extends AppCompatActivity {
                 if(localidades.size()>0){
                     spLocalidad.setVisibility(View.VISIBLE);
                 }
-                localidades.add(0,new Localidad(-1,""));
+                localidades.add(0,new Localidad(-1,getString(R.string.choose_loc)));
                 spinnerAdapterLocalidad.setUbicaciones(localidades);
+                spLocalidad.setSelection(0); //Lo pone en el primer elemento (Ubicacion inexistente: Elige una localidad)
                 progressBar.setVisibility(View.GONE);
             }
         }).execute(URL_LOCALIDAD_BY_PROVINCIA + provincia);

@@ -1,5 +1,7 @@
 package com.catata.spinnerasynctask.model;
 
+import androidx.annotation.NonNull;
+
 public abstract  class Ubicacion {
     int id;
     String descripcion;
@@ -24,4 +26,6 @@ public abstract  class Ubicacion {
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
+
+
 }
